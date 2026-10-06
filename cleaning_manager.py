@@ -16,5 +16,6 @@ def clean_records(parsed_records, cleaning_type):
         return clean_text(parsed_records)
     elif cleaning_type == "date":
         return clean_date(parsed_records)
+    else:
+        raise ValueError(f"Unsupported cleaning type: {cleaning_type}")
 
-    return "Cleaning type not found"
