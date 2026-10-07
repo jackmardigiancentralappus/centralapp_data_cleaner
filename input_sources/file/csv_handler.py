@@ -1,0 +1,32 @@
+import csv
+
+
+def parse_csv_records(file_path):
+
+    with open(file_path, newline='') as csvfile:
+        file_reader = csv.reader(csvfile, delimiter=',')
+        header = next(file_reader, None)
+        if header is None:
+            raise ValueError("The CSV file is empty.")
+
+        header_count = 0
+        print("\nColumn Headers")
+        for column_header in header:
+            header_count += 1
+            print(f"\n {header_count}: {column_header}")
+        
+        id_index = int(input("ID column number: ")) - 1
+        value_index = int(input("Column to clean: ")) - 1
+
+        if not (0 <= id_index < len(header) and 0 <= value_index < len(header)):
+            raise ValueError("Invalid column number.")
+
+        records = []
+        for row in file_reader:
+            records.append({
+                "id": row[id_index],
+                "original_value": row[value_index],
+            })
+
+        return records
+

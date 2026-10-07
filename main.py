@@ -2,6 +2,7 @@ from cleaning_manager import clean_records
 from file_writer import create_output_file
 from pathlib import Path
 from input_sources.salesforce.salesforce_input import get_salesforce_records
+from input_sources.file.file_input import get_file_records
 
 def main() -> None:
 
@@ -16,6 +17,8 @@ def main() -> None:
 
     if record_source == "salesforce":
         returned_records = get_salesforce_records()
+    elif record_source == "file":
+        returned_records = get_file_records()
     else:
         raise ValueError(f"Unsupported source: {record_source}")
     
