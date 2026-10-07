@@ -1,5 +1,6 @@
 from pathlib import Path
 from .csv_handler import parse_csv_records
+from .excel_handler import parse_excel_records
 import csv
 
 def get_file_records():
@@ -7,7 +8,7 @@ def get_file_records():
     print("------------------------")
 
     file_path = Path(
-        input("Path to CSV file: ").strip().strip('"')
+        input("Path to file: ").strip().strip('"')
     ).expanduser()
 
     if not file_path.is_file():
@@ -21,6 +22,6 @@ def get_file_records():
     if suffix == ".csv":
         return parse_csv_records(file_path)
     elif suffix == '.xlsx':
-        print("Excel") 
-
-            
+        return parse_excel_records(file_path)
+    else:
+        raise ValueError("Invalid file suffix")
