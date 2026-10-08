@@ -31,15 +31,17 @@ def clean_email(records):
         invalid_email, invalid_notes = is_invalid_email(cleaned)
         notes.extend(invalid_notes)
 
-        entropy_flag, entropy_notes = check_email_entropy(cleaned)
-        notes.extend(entropy_notes)
+        #entropy_flag, entropy_notes = check_email_entropy(cleaned)
+        #notes.extend(entropy_notes)
 
         if invalid_email:
             record["cleaned_value"] = None
             record["status"] = "Invalid"
-        elif entropy_flag:
-            record["cleaned_value"] = None
-            record["status"] = "Review"
+
+        #elif entropy_flag:
+            #record["cleaned_value"] = None
+            #record["status"] = "Review"
+
         elif suspicious_email:
             record["cleaned_value"] = None
             record["status"] = "Review"
@@ -153,6 +155,7 @@ def is_invalid_email(email):
 
     return bool(notes), notes
 
+"""
 def check_email_entropy(email):
     notes = []
     if email.count("@") != 1:
@@ -188,3 +191,4 @@ def check_email_entropy(email):
         if entropy_flag:
             return entropy_flag, notes
     return entropy_flag, notes
+"""

@@ -16,7 +16,7 @@ def main() -> None:
     keep_missing_values = input("Keep missing values (Y/N) [Y]: ").strip().lower() or "y"
 
     if record_source == "salesforce":
-        returned_records = get_salesforce_records()
+        returned_records = get_salesforce_records(keep_missing_values)
     elif record_source == "file":
         returned_records = get_file_records()
     else:

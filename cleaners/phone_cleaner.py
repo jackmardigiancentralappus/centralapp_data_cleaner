@@ -81,7 +81,7 @@ def correct_simple_typos(phone_number):
     notes = []
     cleaned = phone_number
 
-    normalized = re.sub(r"[–—]", "-", cleaned)
+    normalized = re.sub(r"[\u2010-\u2015\u2212]", "-", cleaned)
 
     if normalized != cleaned:
         notes.append("Normalized dash characters")
