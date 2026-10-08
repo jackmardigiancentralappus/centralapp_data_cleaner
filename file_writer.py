@@ -21,9 +21,9 @@ def create_output_file(records, output_file, keep_unchanged_values, keep_missing
 
         for record in records:
             if (
-                (keep_unchanged_values == "y" or record.get("status") != "Unchanged")
+                (keep_unchanged_values or record.get("status") != "Unchanged")
                 and
-                (keep_missing_values == "y" or record.get("status") != "Missing")
+                (keep_missing_values or record.get("status") != "Missing")
             ):
                 writer.writerow([
                     record.get("id"),

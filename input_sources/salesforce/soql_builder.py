@@ -2,7 +2,7 @@ def build_query(object_name, field_name, sorting, record_limit, keep_missing_val
     print(f"Object:   {object_name}")
     query = 'SELECT Id,' + field_name + ' FROM ' + object_name
     
-    if keep_missing_values == 'n':
+    if not keep_missing_values:
         query = query + " WHERE " + field_name + " != null"
     query = query + ' ORDER BY ' + sorting
     if record_limit != 'all':
