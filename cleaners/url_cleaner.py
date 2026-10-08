@@ -13,33 +13,42 @@ def clean_url(records):
 
         notes = []
 
-        cleaned, whitespace_notes = strip_whitespace(original_value)
-        notes.extend(whitespace_notes)
+        try:
 
-        cleaned, https_notes = add_https(cleaned)
-        notes.extend(https_notes)
+            cleaned, whitespace_notes = strip_whitespace(original_value)
+            notes.extend(whitespace_notes)
 
-        cleaned, slashes_notes = fix_scheme_slashes(cleaned)
-        notes.extend(slashes_notes)
+            cleaned, https_notes = add_https(cleaned)
+            notes.extend(https_notes)
 
-        cleaned, path_slash_notes = remove_extra_path_slashes(cleaned)
-        notes.extend(path_slash_notes)
+            cleaned, slashes_notes = fix_scheme_slashes(cleaned)
+            notes.extend(slashes_notes)
 
-        cleaned, lowercase_notes = lowercase_scheme_and_domain(cleaned)
-        notes.extend(lowercase_notes)
+            cleaned, path_slash_notes = remove_extra_path_slashes(cleaned)
+            notes.extend(path_slash_notes)
 
-        cleaned, period_notes = remove_extra_domain_periods(cleaned)
-        notes.extend(period_notes)
+            cleaned, lowercase_notes = lowercase_scheme_and_domain(cleaned)
+            notes.extend(lowercase_notes)
 
-        cleaned, common_tld_notes = fix_common_tld(cleaned)
-        notes.extend(common_tld_notes)
+            cleaned, period_notes = remove_extra_domain_periods(cleaned)
+            notes.extend(period_notes)
 
-        uncommon_tld_flag, uncommon_tld_notes = has_uncommon_tld(cleaned)
-        notes.extend(uncommon_tld_notes)
+            cleaned, common_tld_notes = fix_common_tld(cleaned)
+            notes.extend(common_tld_notes)
 
-        invalid_url_flag, invalid_url_notes = is_invalid_url(cleaned)
-        notes.extend(invalid_url_notes)
+            uncommon_tld_flag, uncommon_tld_notes = has_uncommon_tld(cleaned)
+            notes.extend(uncommon_tld_notes)
 
+            invalid_url_flag, invalid_url_notes = is_invalid_url(cleaned)
+            notes.extend(invalid_url_notes)
+
+        except ValueError:
+            notes.append("URL contains an invalid hostname or port")
+            record["cleaned_value"] = None
+            record["status"] = "Invalid"
+            record["notes"] = "; ".join(notes)
+            continue
+            
         if invalid_url_flag:
             record["cleaned_value"] = None
             record["status"] = "Invalid"

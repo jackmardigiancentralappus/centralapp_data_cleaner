@@ -154,10 +154,10 @@ def is_invalid_email(email):
     return bool(notes), notes
 
 def check_email_entropy(email):
+    notes = []
     if email.count("@") != 1:
         return False, notes
-
-    notes = []
+        
     entropy_flag = False
     username = email.split("@")[0]
     domain = email.split("@")[1]   

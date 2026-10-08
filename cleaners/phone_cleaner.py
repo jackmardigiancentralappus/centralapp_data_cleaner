@@ -23,24 +23,32 @@ def clean_phone(records):
         original_value = str(original_value)
         cleaned = original_value
 
+        cleaned, whitespace_notes = strip_whitespace(cleaned)
+        notes.extend(whitespace_notes)
+
+        cleaned, simple_typo_notes = correct_simple_typos(cleaned)
+        notes.extend(simple_typo_notes)
+
+        cleaned, extension, extension_notes = apply_extension_option(
+            cleaned, options["keep_extension"]
+        )
+        notes.extend(extension_notes)
+
         invalid_phone_flag, invalid_character_notes = has_invalid_characters(cleaned)
         notes.extend(invalid_character_notes)
 
-        if invalid_phone_flag:
-                record["cleaned_value"] = None
-                record["status"] = "Invalid"
-
-        else:
-            cleaned, whitespace_notes = strip_whitespace(cleaned)
-            notes.extend(whitespace_notes)
-
-            cleaned, simple_typo_notes = correct_simple_typos(cleaned)
-            notes.extend(simple_typo_notes)
-
+        if not invalid_phone_flag:
             country_code = determine_country_code(cleaned)
-
             invalid_phone_flag, invalid_phone_notes = is_invalid_phone(cleaned, country_code)
             notes.extend(invalid_phone_notes)
+
+        if invalid_phone_flag:
+            record["cleaned_value"] = None
+            record["status"] = "Invalid"
+        else:
+            cleaned = format_phone(cleaned, country_code, options["output_format"])
+            if extension is not None:
+                cleaned = f"{cleaned} ext. {extension}"
 
             if cleaned != original_value:
                 record["cleaned_value"] = cleaned
@@ -161,6 +169,36 @@ def is_invalid_phone(phone_number, country_code):
 
     return invalid_phone, notes
 
+def format_phone(phone_number, country_code, output_format):
+    """Format a validated number, keeping international codes when requested."""
+    digits = re.sub(r"\D", "", phone_number)
+    if digits.startswith("00"):
+        digits = digits[2:]
+
+    country_rule = COUNTRY_PHONE_RULES[country_code]
+    national_number = digits
+    if digits.startswith(country_code):
+        remainder = digits[len(country_code):]
+        if re.fullmatch(country_rule["pattern"], remainder):
+            national_number = remainder
+
+    if output_format == "e164":
+        return f"+{country_code}{national_number}"
+
+    if country_code == "1":
+        if output_format == "standard":
+            return f"({national_number[:3]}) {national_number[3:6]}-{national_number[6:]}"
+        if output_format == "dashes":
+            return f"{national_number[:3]}-{national_number[3:6]}-{national_number[6:]}"
+
+    if output_format == "digits":
+        return national_number if country_code == "1" else f"{country_code}{national_number}"
+
+    # No national grouping rules are defined for the other supported countries.
+    if output_format == "dashes":
+        return f"+{country_code}-{national_number}"
+    return f"+{country_code} {national_number}"
+
 def apply_extension_option(phone_number, keep_extension):
     notes = []
     match = EXTENSION_PATTERN.search(phone_number)
@@ -191,6 +229,8 @@ def run_phone_inputs():
     options["output_format"] = input(
         "Output format (Standard/Dashes/Digits/E164) [Standard]: "
     ).strip().lower() or "standard"
+    if options["output_format"] not in {"standard", "dashes", "digits", "e164"}:
+        raise ValueError("Output format must be Standard, Dashes, Digits, or E164")
 
     options["keep_extension"] = (
         input("Keep phone extensions (Y/N) [Y]: ").strip().lower()
