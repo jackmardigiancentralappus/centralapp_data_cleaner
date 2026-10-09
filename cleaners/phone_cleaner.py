@@ -1,4 +1,5 @@
 import re
+from user_input import (ask_choice,ask_yes_no)
 
 from .phone_rules import (
     COUNTRY_PHONE_RULES,
@@ -226,15 +227,7 @@ def run_phone_inputs():
     print("E164:     +15551234567")
     print()
 
-    options["output_format"] = input(
-        "Output format (Standard/Dashes/Digits/E164) [Standard]: "
-    ).strip().lower() or "standard"
-    if options["output_format"] not in {"standard", "dashes", "digits", "e164"}:
-        raise ValueError("Output format must be Standard, Dashes, Digits, or E164")
-
-    options["keep_extension"] = (
-        input("Keep phone extensions (Y/N) [Y]: ").strip().lower()
-        or "y"
-    ) in ("y", "yes")
+    options["output_format"] = ask_choice("Desired Output format (Standard/Dashes/Digits/E164) [standard]: ", ["standard", "dashes", "digits", "e164"], "standard")
+    options["keep_extension"] = ask_yes_no("Keep phone extensions (Y/N) [Y]: ", "y")
 
     return options

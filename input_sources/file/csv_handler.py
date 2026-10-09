@@ -1,5 +1,5 @@
 import csv
-
+from user_input import (ask_number)
 
 def parse_csv_records(file_path):
 
@@ -15,11 +15,8 @@ def parse_csv_records(file_path):
             header_count += 1
             print(f"\n {header_count}: {column_header}")
         
-        id_index = int(input("ID column number: ")) - 1
-        value_index = int(input("Column to clean: ")) - 1
-
-        if not (0 <= id_index < len(header) and 0 <= value_index < len(header)):
-            raise ValueError("Invalid column number.")
+        id_index = ask_number("ID column number: ", 1, header_count) - 1
+        value_index = ask_number("Column to clean: ", 1, header_count) - 1
 
         records = []
         for row in file_reader:

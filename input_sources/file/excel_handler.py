@@ -1,4 +1,5 @@
 from openpyxl import load_workbook
+from user_input import (ask_number)
 
 
 def parse_excel_records(file_path):
@@ -12,10 +13,8 @@ def parse_excel_records(file_path):
         for number, name in enumerate(header, start=1):
             print(f"{number}: {name}")
 
-        id_index = int(input("ID column number: ")) - 1
-        value_index = int(input("Column to clean: ")) - 1
-        if not (0 <= id_index < len(header) and 0 <= value_index < len(header)):
-            raise ValueError("Invalid column number.")
+        id_index = ask_number("ID column number: ", 1, len(header)) - 1
+        value_index = ask_number("Column to clean: ", 1, len(header)) - 1
 
         return [
             {

@@ -1,5 +1,6 @@
 import re
 from .text_rules import DEFAULT_TEXT_OPTIONS, COMMON_REGEX_PRESETS
+from user_input import (ask_choice,ask_yes_no)
 
 def clean_text(records):
     options = run_text_inputs()
@@ -131,54 +132,40 @@ def run_regex(text, regex_pattern, replacement, note):
     return cleaned, notes
 
 def run_text_inputs():
-    text_mode = input(
-        "Mode (Preset/Custom/Both): "
-    ).strip().lower()
+    text_mode = ask_choice("Mode (Preset/Custom/Both): ", ["preset", "custom", "both"])
 
     print(f"{text_mode} selected\n")
 
     options = DEFAULT_TEXT_OPTIONS.copy()
-
     if text_mode in ("preset", "both"):
-        options["trim_whitespace"] = (
-            input("Trim whitespace (Y/N): ").strip().lower()
-            in ("y", "yes")
-        )
-
-        options["collapse_spaces"] = (
-            input("Collapse spaces (Y/N): ").strip().lower()
-            in ("y", "yes")
-        )
-
-        options["remove_html"] = (
-            input("Remove HTML tags (Y/N): ").strip().lower()
-            in ("y", "yes")
-        )
-
-        options["capitalization_type"] = input(
-            "Capitalization (Upper/Lower/Title/Sentence/None): "
-        ).strip().lower()
+        options["trim_whitespace"] = ask_yes_no("Trim whitespace (Y/N): " , "y")
+        options["collapse_spaces"] = ask_yes_no("Collapse spaces (Y/N): " , "y")
+        options["remove_html"] = ask_yes_no("Remove HTML tags (Y/N): " , "y")
+        options["capitalization_type"] = ask_choice("Capitalization (Upper/Lower/Title/Sentence/None) [None]: ", ["upper", "lower", "title", "sentence", "none"], "none")
 
         print("\nAvailable regex presets:")
 
         for preset_name, preset in COMMON_REGEX_PRESETS.items():
             print(f"- {preset_name}: {preset['description']}")
 
-        selected_presets = input(
-            "\nEnter preset names separated by commas [none]: "
-        ).strip().lower()
-
-        if selected_presets:
-            options["preset_regex_types"] = [
-                preset_name.strip()
-                for preset_name in selected_presets.split(",")
-                if preset_name.strip()
-            ]
+        while True:
+            selected = input("\nEnter preset names separated by commas [none]: ").strip().lower()
+            names = [name.strip() for name in selected.split(",") if name.strip()]
+            unknown = [name for name in names if name not in COMMON_REGEX_PRESETS]
+            if not unknown:
+                options["preset_regex_types"] = names
+                break
+            print(f"  Unknown preset(s): {', '.join(unknown)}")
 
     if text_mode in ("custom", "both"):
-        options["custom_regex_pattern"] = input(
-            "Regex pattern: "
-        )
+        while True:
+            pattern = input("Regex pattern: ")
+            try:
+                re.compile(pattern)
+                break
+            except re.error as e:
+                print(f"  That pattern isn't valid ({e}). Try again.")
+        options["custom_regex_pattern"] = pattern
 
         options["custom_regex_replacement"] = input(
             "Replace matches with [nothing]: "

@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 
 from .date_rules import DATE_FORMATS, DEFAULT_DATE_FORMAT
+from user_input import ask_choice
 
 def clean_date(records):
     options = run_date_inputs()
@@ -93,6 +94,7 @@ def apply_date_format(date_value, current_format, output_format=DEFAULT_DATE_FOR
 def run_date_inputs():
 
     options = {}
+    format_choices = ["yyyy-mm-dd", "dd/mm/yyyy", "mm/dd/yyyy"]
 
     print("\nOutput format examples:")
     print("YYYY-MM-DD: 2026-06-12")
@@ -100,16 +102,7 @@ def run_date_inputs():
     print("MM/DD/YYYY:   06/12/2026")
     print()
 
-    options["current_format"] = input(
-        "What is the current date format (YYYY-MM-DD || DD/MM/YYYY || MM/DD/YYYY): "
-    ).strip().upper() or "YYYY-MM-DD"
-
-    options["output_format"] = input(
-        "Output format (YYYY-MM-DD || DD/MM/YYYY || MM/DD/YYYY): "
-    ).strip().upper() or "YYYY-MM-DD"
-
-    for option, date_format in options.items():
-        if date_format not in DATE_FORMATS:
-            raise ValueError(f"Unsupported {option}: {date_format}")
+    options["current_format"] = ask_choice("What is the current date format (YYYY-MM-DD || DD/MM/YYYY || MM/DD/YYYY) [YYYY-MM-DD]: ", format_choices , "yyyy-mm-dd").upper()
+    options["output_format"] = ask_choice("Desired output format (YYYY-MM-DD || DD/MM/YYYY || MM/DD/YYYY) [YYYY-MM-DD]: ", format_choices , "yyyy-mm-dd").upper()
 
     return options
