@@ -1,5 +1,6 @@
 from .email_rules import (COMMON_DOMAIN_TYPOS,SUSPICIOUS_DOMAINS,SUSPICIOUS_USERNAMES,)
 import math
+import re
 
 def clean_email(records):
     for record in records:
@@ -15,6 +16,9 @@ def clean_email(records):
 
         cleaned, whitespace_notes = strip_whitespace(original_value)
         notes.extend(whitespace_notes)
+
+        cleaned, wrapping_characters_notes = strip_wrapping_characters(cleaned)
+        notes.extend(wrapping_characters_notes)
 
         cleaned, lowercase_notes = change_to_lowercase(cleaned)
         notes.extend(lowercase_notes)
@@ -132,6 +136,12 @@ def is_invalid_email(email):
 
     username, domain = email.split("@")
 
+    if re.search(r"[^a-z0-9._%+'-]", username):
+        notes.append("Email username contains invalid characters")
+
+    if re.search(r"[^a-z0-9.-]", domain):
+        notes.append("Email domain contains invalid characters")
+
     if not username:
         notes.append("Email username is missing")
 
@@ -154,6 +164,20 @@ def is_invalid_email(email):
         notes.append("Email contains consecutive periods")
 
     return bool(notes), notes
+
+def strip_wrapping_characters(email):
+    notes = []
+    cleaned = email
+
+    if cleaned.startswith("mailto:"):
+        cleaned = cleaned[len("mailto:"):]
+
+    cleaned = cleaned.strip("<>\"' ").rstrip(".,;:")
+
+    if cleaned != email:
+        notes.append("Removed surrounding punctuation")
+
+    return cleaned, notes
 
 """
 def check_email_entropy(email):

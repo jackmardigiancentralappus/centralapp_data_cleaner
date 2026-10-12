@@ -61,4 +61,25 @@ COMMON_TLDS = {
     "tech",
     "online",
     "store",
+    "site",
+    "shop",
+    "pro",
+    "club",
+
+        # Countries
+    "mx",   # Mexico
+    "de",   # Germany
+    "fr",   # France
+    "es",   # Spain
+    "it",   # Italy
+    "nl",   # Netherlands
+    "eu",   # European Union
+    "ie",   # Ireland
+    "nz",   # New Zealand
+    "ch",   # Switzerland
+    "se",   # Sweden
+    "in",   # India
+    "br",   # Brazil
+    "jp",   # Japan
+    "tv",   # often used by media companies
 }
