@@ -40,12 +40,17 @@ def clean_phone(records):
 
         if not invalid_phone_flag:
             country_code = determine_country_code(cleaned)
+            fake_flag, fake_phone_notes = is_fake_phone(cleaned, country_code)
+            notes.extend(fake_phone_notes)
             invalid_phone_flag, invalid_phone_notes = is_invalid_phone(cleaned, country_code)
             notes.extend(invalid_phone_notes)
 
         if invalid_phone_flag:
             record["cleaned_value"] = None
             record["status"] = "Invalid"
+        elif fake_flag:
+            record["cleaned_value"] = None
+            record["status"] = "Review"
         else:
             cleaned = format_phone(cleaned, country_code, options["output_format"])
             if extension is not None:
@@ -216,6 +221,30 @@ def apply_extension_option(phone_number, keep_extension):
 
     notes.append("Removed phone extension")
     return phone_without_extension, None, notes
+
+def is_fake_phone(phone_number, country_code):
+    notes = []
+    digits = re.sub(r"\D", "", phone_number)
+    if digits.startswith("00"):
+        digits = digits[2:]
+
+    # Look at the number without its country code
+    rule = COUNTRY_PHONE_RULES.get(country_code)
+    if rule and digits.startswith(country_code):
+        rest = digits[len(country_code):]
+        if re.fullmatch(rule["pattern"], rest):
+            digits = rest
+
+    fake = (
+        len(set(digits)) == 1                      
+        or len(set(digits[-7:])) == 1              
+        or digits in "01234567890123456789"        
+        or digits in "98765432109876543210"        
+    )
+
+    if fake:
+        notes.append("Looks like a placeholder number")
+    return fake, notes
 
 def run_phone_inputs():
     options = DEFAULT_PHONE_OPTIONS.copy()
