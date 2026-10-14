@@ -1,6 +1,19 @@
 from openpyxl import load_workbook
 from user_input import (ask_number)
+from datetime import datetime, date
 
+def cell_to_text(value):
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        if value.time() == datetime.min.time():      # date-only cell
+            return value.strftime("%Y-%m-%d")
+        return value.isoformat(sep=" ")              # real date+time, keep it
+    if isinstance(value, date):
+        return value.strftime("%Y-%m-%d")
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))                       # 4045551212.0 -> "4045551212"
+    return str(value)
 
 def parse_excel_records(file_path):
     workbook = load_workbook(file_path, read_only=True, data_only=True)
@@ -18,8 +31,8 @@ def parse_excel_records(file_path):
 
         return [
             {
-                "id": str(row[id_index]) if row[id_index] is not None else None,
-                "original_value": str(row[value_index]) if row[value_index] is not None else None,
+                "id": cell_to_text(row[id_index]),
+                "original_value": cell_to_text(row[value_index]),
             }
             for row in rows
         ]
