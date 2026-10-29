@@ -52,7 +52,8 @@ def clean_phone(records):
             record["cleaned_value"] = None
             record["status"] = "Review"
         else:
-            cleaned = format_phone(cleaned, country_code, options["output_format"])
+            if options["output_format"] != "none":
+                cleaned = format_phone(cleaned, country_code, options["output_format"])
             if extension is not None:
                 cleaned = f"{cleaned} ext. {extension}"
 
