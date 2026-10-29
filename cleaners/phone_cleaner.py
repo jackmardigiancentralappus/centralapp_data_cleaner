@@ -256,7 +256,7 @@ def run_phone_inputs():
     print("E164:     +15551234567")
     print()
 
-    options["output_format"] = ask_choice("Desired Output format (Standard/Dashes/Digits/E164) [standard]: ", ["standard", "dashes", "digits", "e164"], "standard")
+    options["output_format"] = ask_choice("Desired Output format (Standard/Dashes/Digits/E164/None) [standard]: ", ["standard", "dashes", "digits", "e164", 'none'], "standard")
     options["keep_extension"] = ask_yes_no("Keep phone extensions (Y/N) [Y]: ", "y")
 
     return options
